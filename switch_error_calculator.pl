@@ -10,14 +10,32 @@ my $VCF2 = shift;
 #my $line2=<IN2>;
 my $vcfSample = Vcf->new( file => $VCF1, version => '4.1' );
 $vcfSample->parse_header();
-my (@samples) = $vcfSample->get_samples();
+my (@resultSamples) = $vcfSample->get_samples();
 $vcfSample->close();
+
+$vcfSample = Vcf->new( file => $VCF2, version => '4.1' );
+$vcfSample->parse_header();
+my (@refSamples) = $vcfSample->get_samples();
+$vcfSample->close();
+
+my %resultSamples=map{$_ =>1} @resultSamples;
+my %refSamples=map{$_=>1} @refSamples;
+
+# the intersection of @females and @simpsons:
+my @samples = grep( $resultSamples{$_}, @refSamples );
+
+
 
 my $vcfResult = Vcf->new( file => $VCF1, version => '4.1' );
 my $vcfRef    = Vcf->new( file => $VCF2, version => '4.1' );
 
 $vcfResult->parse_header();
 $vcfRef->parse_header();
+$vcfResult->set_samples(include=>\@samples);
+$vcfRef->set_samples(include=>\@samples);
+
+#$vcfResult->parse_header();
+#$vcfRef->parse_header();
 
 my $x = $vcfResult->next_data_hash();
 my $y = $vcfRef->next_data_hash();
@@ -50,7 +68,6 @@ while ( defined($x) and defined($y) ) {
 
 		#	$vcfResult->set_samples(include=>[$sampleID]);
 		#	$vcfRef->set_samples(include=>[$sampleID]);
-
 		my ( $al1, $asep, $al2 ) = return_alleles($vcfResult,$x, $sampleID );
 
 		my ( $bl1, $bsep, $bl2 ) = return_alleles($vcfRef,$y, $sampleID );
