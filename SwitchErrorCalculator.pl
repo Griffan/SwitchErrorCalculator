@@ -63,7 +63,17 @@ while ( defined($x) and defined($y) ) {
 		$y = $vcfRef->next_data_hash();
 		next;
 	}
-
+	elsif($$x{REF} ne $$y{REF})
+	{
+		print "ne ref: $$x{POS} $$x{REF} $$y{REF}\n";
+		$y = $vcfRef->next_data_hash();
+		next;
+	}
+#	elsif($$x{ALT}->[0] ne $$y{ALT}->[0])
+#	{
+#		$y = $vcfRef->next_data_hash();
+#		next;
+#	}
 	foreach my $sampleID (@samples) {
 
 		#	$vcfResult->set_samples(include=>[$sampleID]);
@@ -85,7 +95,7 @@ $vcfRef->close();
 foreach my $sampleID (@samples) {
 	print "SampleID:", $sampleID, "\tTotoal heter:", $heter_cnt{$sampleID},
 	  "\ttotal switch error:", $switch_error{$sampleID},
-	  "\trate:", $switch_error{$sampleID} / ( $heter_cnt{$sampleID} - 1 ),
+	  "\trate:", $heter_cnt{$sampleID}?$switch_error{$sampleID} / ( $heter_cnt{$sampleID} - 1 ):0,
 	  "\ttotal geno error:", $wrong_geno{$sampleID},"\n";
 }
 sub return_alleles
@@ -103,6 +113,10 @@ sub return_alleles
 sub compare_geno {
 	my ( $alleleA, $alleleB, $alleleC, $alleleD, $sampleID ) = @_;
 #	print "received:",$alleleA, $alleleB, $alleleC, $alleleD,"ori",$ori{$sampleID},"\n";
+	if ( $alleleA eq "" or $alleleA eq "." or $alleleC eq "" or $alleleC eq ".")
+	{
+		return 0;
+	}
 	if ( ( $alleleA + $alleleB ) != ( $alleleC + $alleleD ) ) {
 		$wrong_geno{$sampleID}++;
 		return 0;
