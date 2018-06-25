@@ -43,13 +43,13 @@ while(defined($line1) and defined($line2))
 	$line2=<IN2>;
 	my @A=split /\:/,$a[$#a];
 	my @B=split /\:/,$b[$#b];
-	$a[$#a]=~/^(.)\|(.)/;
+	$a[$#a]=~/^(.)(\||\/)(.)/;
 	my $alleleA=$1;
-	my $alleleB=$2;
+	my $alleleB=$3;
 	if($alleleA ne $alleleB) {$heter_cnt+=1;}
-	$b[$#b]=~/^(.)\|(.)/;
+	$b[$#b]=~/^(.)(\||\/)(.)/;
 	my $alleleC=$1;
-	my $alleleD=$2;
+	my $alleleD=$3;
 #	print $alleleA,$alleleB,$alleleC,$alleleD,"\n";
 	if(($alleleA+$alleleB) != ($alleleC+$alleleD))
 	{
